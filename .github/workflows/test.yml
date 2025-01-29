@@ -1,8 +1,6 @@
-name: CI
+name: test
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 env:
@@ -25,17 +23,9 @@ jobs:
         with:
           version: nightly
 
-      - name: Show Forge version
-        run: |
-          forge --version
-
-      - name: Run Forge fmt
-        run: |
-          forge fmt --check
-        id: fmt
-
       - name: Run Forge build
         run: |
+          forge --version
           forge build --sizes
         id: build
 

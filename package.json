@@ -1,0 +1,32 @@
+{
+  "name": "salamgcc-contracts",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "grsLammy <grspro98@gmail.com>",
+  "scripts": {
+    "prettier": "npx prettier --write '{test,scripts,script,src,tasks}/{**/*,*}.{js,ts,jsx,tsx,sol}'",
+    "lint:sol": "solhint --max-warnings 0 \"src/**/*.sol\" \"test/**/*.sol\" \"script/**/*.sol\"",
+    "slither": "slither .",
+    "test": "forge test -vv",
+    "test_fork": "forge test --match-test test_fork --fork-url https://eth-mainnet.g.alchemy.com/v2/ESrlxBQxB17StnQQKuXeV8V1o4G5aLuW --fork-block-number 20370368 -vv",
+    "script": "forge script --rpc-url [add RPC_URL] [file_path] --broadcast",
+    "prepare": "husky"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test",
+    "src": "src",
+    "script": "script"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "husky": "^9.1.7",
+    "prettier": "^3.4.2",
+    "prettier-plugin-solidity": "^1.4.2",
+    "solhint": "^5.0.5",
+    "solhint-plugin-prettier": "^0.1.0",
+    "solidity-coverage": "^0.8.14"
+  }
+}

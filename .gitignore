@@ -6,9 +6,27 @@ out/
 !/broadcast
 /broadcast/*/31337/
 /broadcast/**/dry-run/
+broadcast/
 
 # Docs
 docs/
 
 # Dotenv file
 .env
+.idea
+node_modules
+.lock
+/yarn.lock
+artifacts
+broadcast
+local.
+
+# Todo
+TODO
+
+# coverage report
+coverage
+lcov.info
+
+# node modules
+node_modules
