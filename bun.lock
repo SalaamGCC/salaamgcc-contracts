@@ -7,6 +7,7 @@
         "@commitlint/cli": "^19.6.1",
         "@commitlint/config-conventional": "^19.6.0",
         "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+        "hardhat-contract-sizer": "^2.10.0",
         "husky": "^9.1.7",
         "prettier": "^3.4.2",
         "prettier-plugin-solidity": "^1.4.2",
@@ -32,6 +33,8 @@
     "@babel/traverse": ["@babel/traverse@7.26.7", "", { "dependencies": { "@babel/code-frame": "^7.26.2", "@babel/generator": "^7.26.5", "@babel/parser": "^7.26.7", "@babel/template": "^7.25.9", "@babel/types": "^7.26.7", "debug": "^4.3.1", "globals": "^11.1.0" } }, "sha512-1x1sgeyRLC3r5fQOM0/xtQKsYjyxmFjaOrLJNtZ81inNjyJHGIolTULPiSc/2qe1/qfpFLisLQYFnnZl7QoedA=="],
 
     "@babel/types": ["@babel/types@7.26.7", "", { "dependencies": { "@babel/helper-string-parser": "^7.25.9", "@babel/helper-validator-identifier": "^7.25.9" } }, "sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg=="],
+
+    "@colors/colors": ["@colors/colors@1.5.0", "", {}, "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ=="],
 
     "@commitlint/cli": ["@commitlint/cli@19.6.1", "", { "dependencies": { "@commitlint/format": "^19.5.0", "@commitlint/lint": "^19.6.0", "@commitlint/load": "^19.6.1", "@commitlint/read": "^19.5.0", "@commitlint/types": "^19.5.0", "tinyexec": "^0.3.0", "yargs": "^17.0.0" }, "bin": { "commitlint": "cli.js" } }, "sha512-8hcyA6ZoHwWXC76BoC8qVOSr8xHy00LZhZpauiD0iO0VYbVhMnED0da85lTfIULxl7Lj4c6vZgF0Wu/ed1+jlQ=="],
 
@@ -319,6 +322,8 @@
 
     "cli-boxes": ["cli-boxes@2.2.1", "", {}, "sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw=="],
 
+    "cli-table3": ["cli-table3@0.6.5", "", { "dependencies": { "string-width": "^4.2.0" }, "optionalDependencies": { "@colors/colors": "1.5.0" } }, "sha512-+W/5efTR7y5HRD7gACw9yQjqMVvEMLBHmboM/kPWam+H+Hmyrgjh6YncVKK122YZkXrLudzTuAukUw9FnMf7IQ=="],
+
     "cliui": ["cliui@8.0.1", "", { "dependencies": { "string-width": "^4.2.0", "strip-ansi": "^6.0.1", "wrap-ansi": "^7.0.0" } }, "sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ=="],
 
     "color-convert": ["color-convert@2.0.1", "", { "dependencies": { "color-name": "~1.1.4" } }, "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ=="],
@@ -478,6 +483,8 @@
     "handlebars": ["handlebars@4.7.8", "", { "dependencies": { "minimist": "^1.2.5", "neo-async": "^2.6.2", "source-map": "^0.6.1", "wordwrap": "^1.0.0" }, "optionalDependencies": { "uglify-js": "^3.1.4" }, "bin": { "handlebars": "bin/handlebars" } }, "sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ=="],
 
     "hardhat": ["hardhat@2.22.18", "", { "dependencies": { "@ethersproject/abi": "^5.1.2", "@metamask/eth-sig-util": "^4.0.0", "@nomicfoundation/edr": "^0.7.0", "@nomicfoundation/ethereumjs-common": "4.0.4", "@nomicfoundation/ethereumjs-tx": "5.0.4", "@nomicfoundation/ethereumjs-util": "9.0.4", "@nomicfoundation/solidity-analyzer": "^0.1.0", "@sentry/node": "^5.18.1", "@types/bn.js": "^5.1.0", "@types/lru-cache": "^5.1.0", "adm-zip": "^0.4.16", "aggregate-error": "^3.0.0", "ansi-escapes": "^4.3.0", "boxen": "^5.1.2", "chokidar": "^4.0.0", "ci-info": "^2.0.0", "debug": "^4.1.1", "enquirer": "^2.3.0", "env-paths": "^2.2.0", "ethereum-cryptography": "^1.0.3", "ethereumjs-abi": "^0.6.8", "find-up": "^5.0.0", "fp-ts": "1.19.3", "fs-extra": "^7.0.1", "immutable": "^4.0.0-rc.12", "io-ts": "1.10.4", "json-stream-stringify": "^3.1.4", "keccak": "^3.0.2", "lodash": "^4.17.11", "mnemonist": "^0.38.0", "mocha": "^10.0.0", "p-map": "^4.0.0", "picocolors": "^1.1.0", "raw-body": "^2.4.1", "resolve": "1.17.0", "semver": "^6.3.0", "solc": "0.8.26", "source-map-support": "^0.5.13", "stacktrace-parser": "^0.1.10", "tinyglobby": "^0.2.6", "tsort": "0.0.1", "undici": "^5.14.0", "uuid": "^8.3.2", "ws": "^7.4.6" }, "peerDependencies": { "ts-node": "*", "typescript": "*" }, "optionalPeers": ["ts-node", "typescript"], "bin": { "hardhat": "internal/cli/bootstrap.js" } }, "sha512-2+kUz39gvMo56s75cfLBhiFedkQf+gXdrwCcz4R/5wW0oBdwiyfj2q9BIkMoaA0WIGYYMU2I1Cc4ucTunhfjzw=="],
+
+    "hardhat-contract-sizer": ["hardhat-contract-sizer@2.10.0", "", { "dependencies": { "chalk": "^4.0.0", "cli-table3": "^0.6.0", "strip-ansi": "^6.0.0" }, "peerDependencies": { "hardhat": "^2.0.0" } }, "sha512-QiinUgBD5MqJZJh1hl1jc9dNnpJg7eE/w4/4GEnrcmZJJTDbVFNe3+/3Ep24XqISSkYxRz36czcPHKHd/a0dwA=="],
 
     "has-flag": ["has-flag@4.0.0", "", {}, "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ=="],
 
