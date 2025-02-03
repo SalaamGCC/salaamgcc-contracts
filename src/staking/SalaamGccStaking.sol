@@ -138,8 +138,9 @@ contract SalaamGccStaking is HelperFunctions {
 
     /// @notice Stakes a given amount of tokens
     /// @dev The amount must be greater than 0 and staking must be allowed
+    /// @param user The address of user to stake
     /// @param amount The amount of tokens to stake
-    function stake(uint256 amount) external nonReentrant {
+    function stake(address user, uint256 amount) external nonReentrant {
         if (amount == 0) {
             revert ZeroAmountNotAllowed();
         }
@@ -149,15 +150,14 @@ contract SalaamGccStaking is HelperFunctions {
         if (totalSupply + amount >= stakingCap) {
             revert StakingCapExceeded();
         }
-        address caller = msg.sender;
-        rewards[caller] = _updateReward(caller);
+        rewards[user] = _updateReward(user);
 
         totalSupply += amount;
         totalStaked += amount;
 
-        balanceOf[caller] += amount;
-        stakingToken.safeTransferFrom(caller, address(this), amount);
-        emit Staked(caller, amount);
+        balanceOf[user] += amount;
+        stakingToken.safeTransferFrom(msg.sender, address(this), amount);
+        emit Staked(user, amount);
     }
 
     /// @notice Withdraws a given amount of tokens
