@@ -2,11 +2,11 @@
 pragma solidity ^0.8.28;
 
 import { Test } from "forge-std/Test.sol";
-import { SalaamGCC } from "../../src/token/SalaamGCC.sol";
+import { SalaamGcc } from "../../src/token/SalaamGcc.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-contract SalaamGCCTest is Test {
-    SalaamGCC private token;
+contract SalaamGccTest is Test {
+    SalaamGcc private token;
     address private owner;
     address private minter;
     address private adminOne;
@@ -23,7 +23,7 @@ contract SalaamGCCTest is Test {
         nonAdmin = address(0x6);
 
         vm.prank(owner);
-        SalaamGCC implementation = new SalaamGCC();
+        SalaamGcc implementation = new SalaamGcc();
         bytes memory data = abi.encodeWithSignature(
             "initialize(address,address[3],address)",
             owner,
@@ -31,7 +31,7 @@ contract SalaamGCCTest is Test {
             minter
         );
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(address(implementation), owner, data);
-        token = SalaamGCC(address(proxy));
+        token = SalaamGcc(address(proxy));
         vm.label(address(token), "token");
     }
 
@@ -61,14 +61,14 @@ contract SalaamGCCTest is Test {
 
     function testChangeMinterWithInvalidAddress() public {
         vm.prank(owner);
-        vm.expectRevert(SalaamGCC.InvalidAddress.selector);
+        vm.expectRevert(SalaamGcc.InvalidAddress.selector);
         token.setMinter(address(0));
     }
 
     function testPauseAndUnpauseByAdmin() public {
         vm.prank(adminOne);
         token.pause();
-        vm.expectRevert(SalaamGCC.ContractPaused.selector);
+        vm.expectRevert(SalaamGcc.ContractPaused.selector);
         vm.prank(minter);
         token.mint(owner, 1000 ether);
         vm.prank(adminOne);
@@ -80,7 +80,7 @@ contract SalaamGCCTest is Test {
     function testPausedTransfers() public {
         vm.prank(adminOne);
         token.pause();
-        vm.expectRevert(SalaamGCC.ContractPaused.selector);
+        vm.expectRevert(SalaamGcc.ContractPaused.selector);
         vm.prank(owner);
         token.transfer(address(0x9), 100 ether);
     }
@@ -106,7 +106,7 @@ contract SalaamGCCTest is Test {
         token.pause();
         vm.stopPrank();
         vm.startPrank(minter);
-        vm.expectRevert(SalaamGCC.ContractPaused.selector);
+        vm.expectRevert(SalaamGcc.ContractPaused.selector);
         token.mint(owner, 1000 ether);
         vm.stopPrank();
     }
@@ -122,7 +122,7 @@ contract SalaamGCCTest is Test {
         vm.prank(adminOne);
         token.pause();
         vm.prank(minter);
-        vm.expectRevert(SalaamGCC.ContractPaused.selector);
+        vm.expectRevert(SalaamGcc.ContractPaused.selector);
         token.mint(owner, 1000 ether);
         vm.prank(adminOne);
         token.unpause();

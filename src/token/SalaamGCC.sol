@@ -2,6 +2,7 @@
 pragma solidity 0.8.28;
 
 /// @title SalaamGCC ERC20 Token
+/// @author SalaamGCC
 /// @notice ERC20 token with capped supply, pausability, ownership, access control, and UUPS upgradability.
 /// @dev Uses OpenZeppelin upgradeable contracts for modularity and security.
 import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -13,7 +14,7 @@ import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/P
 import { AccessControlUpgradeable } from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract SalaamGCC is
+contract SalaamGcc is
     ERC20Upgradeable,
     ERC20CappedUpgradeable,
     PausableUpgradeable,
