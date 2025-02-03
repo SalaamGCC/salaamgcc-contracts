@@ -115,7 +115,7 @@ contract TotalSupplyTest is StakingTest {
 
         vm.startPrank(owner);
         sampleToken.approve(address(staking), 2 ether);
-        staking.stake(2 ether);
+        staking.stake(owner, 2 ether);
         vm.stopPrank();
 
         assertEq(staking.totalSupply(), 2 ether);
@@ -128,7 +128,7 @@ contract BalanceOfTest is StakingTest {
 
         vm.startPrank(owner);
         sampleToken.approve(address(staking), 2 ether);
-        staking.stake(2 ether);
+        staking.stake(owner, 2 ether);
         vm.stopPrank();
 
         assertEq(staking.balanceOf(owner), 2 ether);
@@ -158,7 +158,7 @@ contract StakingFunctionalityTest is StakingTest {
         uint256 amount = 1000 ether;
         vm.startPrank(owner);
         sampleToken.approve(stakingAddress, amount);
-        staking.stake(amount);
+        staking.stake(owner, amount);
         vm.stopPrank();
 
         assertEq(staking.balanceOf(owner), amount);
@@ -169,7 +169,7 @@ contract StakingFunctionalityTest is StakingTest {
         vm.startPrank(owner);
         sampleToken.approve(stakingAddress, amount);
         vm.expectRevert();
-        staking.stake(amount);
+        staking.stake(owner, amount);
         vm.stopPrank();
     }
 }
@@ -180,7 +180,7 @@ contract WithdrawFunctionalityTest is StakingTest {
         vm.startPrank(owner);
         staking.setIsWithdrawEnable(true);
         sampleToken.approve(stakingAddress, amount);
-        staking.stake(amount);
+        staking.stake(owner, amount);
         staking.withdraw(amount);
         vm.stopPrank();
 
@@ -195,7 +195,7 @@ contract WithdrawFunctionalityTest is StakingTest {
 
         vm.startPrank(owner);
         sampleToken.approve(stakingAddress, amount);
-        staking.stake(amount);
+        staking.stake(owner, amount);
         vm.expectRevert();
         staking.withdraw(amount);
         vm.stopPrank();
@@ -208,7 +208,7 @@ contract RewardFunctionalityTest is StakingTest {
         vm.startPrank(owner);
         staking.setIsWithdrawEnable(true);
         sampleToken.approve(stakingAddress, amount);
-        staking.stake(amount);
+        staking.stake(owner, amount);
         vm.warp(block.timestamp + rewardsDuration);
         staking.getReward();
         vm.stopPrank();
@@ -247,7 +247,7 @@ contract AdminFunctionsTest is StakingTest {
         uint256 amount = 1000 ether;
         vm.startPrank(owner);
         sampleToken.approve(stakingAddress, amount);
-        staking.stake(amount);
+        staking.stake(owner, amount);
         staking.sweep(sampleTokenAddress, amount);
         vm.stopPrank();
     }
@@ -256,7 +256,7 @@ contract AdminFunctionsTest is StakingTest {
         uint256 amount = 1000 ether;
         vm.startPrank(owner);
         sampleToken.approve(stakingAddress, amount);
-        staking.stake(amount);
+        staking.stake(owner, amount);
         staking.recoverERC20(sampleTokenAddress, amount);
         vm.stopPrank();
     }
