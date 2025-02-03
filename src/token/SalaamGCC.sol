@@ -36,11 +36,6 @@ contract SalaamGcc is
     /// @notice Thrown when an invalid (zero) address is provided.
     error InvalidAddress();
 
-    /// @notice Emitted when the minter role is reassigned.
-    /// @param oldMinter The address of the previous minter.
-    /// @param newMinter The address of the new minter.
-    event MinterChanged(address indexed oldMinter, address indexed newMinter);
-
     string private constant _NAME = "SalaamGCC";
     string private constant _SYMBOL = "SGCC";
     uint256 private constant _TOTAL_SUPPLY = 6_000_000_000 ether;
@@ -50,6 +45,11 @@ contract SalaamGcc is
 
     /// @notice Address authorized to mint new tokens.
     address private _minter;
+
+    /// @notice Emitted when the minter role is reassigned.
+    /// @param oldMinter The address of the previous minter.
+    /// @param newMinter The address of the new minter.
+    event MinterChanged(address indexed oldMinter, address indexed newMinter);
 
     constructor() ERC20Upgradeable() ERC20CappedUpgradeable() {
         _disableInitializers();
