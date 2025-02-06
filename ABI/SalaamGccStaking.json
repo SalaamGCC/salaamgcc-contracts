@@ -1,0 +1,346 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        { "name": "_rewardsToken", "type": "address", "internalType": "address" },
+        { "name": "_stakingToken", "type": "address", "internalType": "address" },
+        { "name": "_rewardsDuration", "type": "uint256", "internalType": "uint256" },
+        { "name": "_stakingTill", "type": "uint256", "internalType": "uint256" },
+        { "name": "_stakingCap", "type": "uint256", "internalType": "uint256" },
+        { "name": "_rate", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "balanceOf",
+      "inputs": [{ "name": "user", "type": "address", "internalType": "address" }],
+      "outputs": [{ "name": "balanceOf", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    { "type": "function", "name": "exit", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+    { "type": "function", "name": "getReward", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+    {
+      "type": "function",
+      "name": "getRewardForDuration",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "isWithdrawEnable",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "lastUpdateTime",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    { "type": "function", "name": "notifyRewardAmount", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+    {
+      "type": "function",
+      "name": "owner",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "periodFinish",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "recoverERC20",
+      "inputs": [
+        { "name": "_token", "type": "address", "internalType": "address" },
+        { "name": "_amount", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    { "type": "function", "name": "renounceOwnership", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+    {
+      "type": "function",
+      "name": "rewardPool",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "rewardRate",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "rewards",
+      "inputs": [{ "name": "user", "type": "address", "internalType": "address" }],
+      "outputs": [{ "name": "rewards", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "rewardsDuration",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "rewardsToken",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address", "internalType": "contract IERC20" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "setCap",
+      "inputs": [{ "name": "_newCap", "type": "uint256", "internalType": "uint256" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setIsWithdrawEnable",
+      "inputs": [{ "name": "_isWithdrawEnable", "type": "bool", "internalType": "bool" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setSweeper",
+      "inputs": [
+        { "name": "account", "type": "address", "internalType": "address" },
+        { "name": "enable", "type": "bool", "internalType": "bool" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "stake",
+      "inputs": [
+        { "name": "user", "type": "address", "internalType": "address" },
+        { "name": "amount", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "stakingCap",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "stakingTill",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "stakingToken",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address", "internalType": "contract IERC20" }],
+      "stateMutability": "view"
+    },
+    { "type": "function", "name": "startStaking", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+    { "type": "function", "name": "stopStaking", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
+    {
+      "type": "function",
+      "name": "stoppedAt",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "sweep",
+      "inputs": [
+        { "name": "token", "type": "address", "internalType": "address" },
+        { "name": "amount", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "sweepers",
+      "inputs": [{ "name": "_user", "type": "address", "internalType": "address" }],
+      "outputs": [{ "name": "sweepers", "type": "bool", "internalType": "bool" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalRewardsDistributed",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalStaked",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalSupply",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "inputs": [{ "name": "newOwner", "type": "address", "internalType": "address" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "updateInterest",
+      "inputs": [{ "name": "rate", "type": "uint256", "internalType": "uint256" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "withdraw",
+      "inputs": [{ "name": "amount", "type": "uint256", "internalType": "uint256" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "CapChange",
+      "inputs": [
+        { "name": "oldCap", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "newCap", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "IsWithdrawEnableChanged",
+      "inputs": [{ "name": "isWithdrawEnable", "type": "bool", "indexed": false, "internalType": "bool" }],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "OwnershipTransferred",
+      "inputs": [
+        { "name": "previousOwner", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "newOwner", "type": "address", "indexed": true, "internalType": "address" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Recovered",
+      "inputs": [
+        { "name": "token", "type": "address", "indexed": false, "internalType": "address" },
+        { "name": "amount", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RewardAdded",
+      "inputs": [{ "name": "reward", "type": "uint256", "indexed": false, "internalType": "uint256" }],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RewardPaid",
+      "inputs": [
+        { "name": "user", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "reward", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "SetSweeper",
+      "inputs": [
+        { "name": "account", "type": "address", "indexed": false, "internalType": "address" },
+        { "name": "enable", "type": "bool", "indexed": false, "internalType": "bool" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Staked",
+      "inputs": [
+        { "name": "user", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "amount", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    },
+    { "type": "event", "name": "StakingStart", "inputs": [], "anonymous": false },
+    {
+      "type": "event",
+      "name": "StakingStopped",
+      "inputs": [{ "name": "at", "type": "uint256", "indexed": false, "internalType": "uint256" }],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Sweeped",
+      "inputs": [
+        { "name": "token", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "amount", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Withdrawn",
+      "inputs": [
+        { "name": "user", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "amount", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    },
+    { "type": "error", "name": "CallerDoesNotHaveAccess", "inputs": [] },
+    { "type": "error", "name": "InvalidCaller", "inputs": [] },
+    { "type": "error", "name": "InvalidCapLimit", "inputs": [] },
+    {
+      "type": "error",
+      "name": "OwnableInvalidOwner",
+      "inputs": [{ "name": "owner", "type": "address", "internalType": "address" }]
+    },
+    {
+      "type": "error",
+      "name": "OwnableUnauthorizedAccount",
+      "inputs": [{ "name": "account", "type": "address", "internalType": "address" }]
+    },
+    { "type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": [] },
+    {
+      "type": "error",
+      "name": "SafeERC20FailedOperation",
+      "inputs": [{ "name": "token", "type": "address", "internalType": "address" }]
+    },
+    { "type": "error", "name": "StakingCapExceeded", "inputs": [] },
+    { "type": "error", "name": "StakingNotAllowed", "inputs": [] },
+    { "type": "error", "name": "StakingNotYetOver", "inputs": [] },
+    { "type": "error", "name": "WithdrawNotAllowed", "inputs": [] },
+    { "type": "error", "name": "ZeroAddressNotAllowed", "inputs": [] },
+    { "type": "error", "name": "ZeroAmountNotAllowed", "inputs": [] }
+  ]
+}
