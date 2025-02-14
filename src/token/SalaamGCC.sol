@@ -91,12 +91,14 @@ contract SalaamGcc is
         address[3] memory adminAddresses,
         address minterAddress
     ) internal onlyInitializing {
+        if (adminAddresses[0] == address(0) || adminAddresses[1] == address(0) || adminAddresses[2] == address(0))
+            revert InvalidAddress();
+
         _transferOwnership(owner);
         _minter = minterAddress;
 
         // Ensure the owner is one of the admin addresses
         _grantRole(ADMIN_ROLE, owner);
-
         _grantRole(ADMIN_ROLE, adminAddresses[0]);
         _grantRole(ADMIN_ROLE, adminAddresses[1]);
         _grantRole(ADMIN_ROLE, adminAddresses[2]);
