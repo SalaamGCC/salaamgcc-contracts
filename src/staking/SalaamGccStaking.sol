@@ -239,11 +239,10 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
             uint256 _rewardPool = rewardPool;
             rewardPool = reward;
             rewardsToken.safeTransferFrom(msg.sender, address(this), reward - _rewardPool);
+            lastUpdateTime = timestamp;
+            periodFinish = timestamp + rewardsDuration * 1 days;
+            emit RewardAdded(reward);
         }
-
-        lastUpdateTime = timestamp;
-        periodFinish = timestamp + rewardsDuration * 1 days;
-        emit RewardAdded(reward);
     }
 
     /// @notice Updates the reward rate
