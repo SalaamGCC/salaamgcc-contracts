@@ -179,12 +179,12 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         if (totalSupply + amount >= stakingCap) {
             revert StakingCapExceeded();
         }
-        rewards[user] = _updateReward(user);
 
+        balanceOf[user] += amount;
         totalSupply += amount;
         totalStaked += amount;
 
-        balanceOf[user] += amount;
+        rewards[user] = _updateReward(user);
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
         emit Staked(user, amount);
     }
@@ -208,6 +208,12 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         totalSupply -= amount;
         balanceOf[caller] -= amount;
 
+        if (totalStaked > 0) {
+            unchecked {
+                totalStaked = totalStaked > amount ? totalStaked - amount : 0;
+            }
+        }
+
         stakingToken.safeTransfer(caller, amount);
         emit Withdrawn(caller, amount);
     }
@@ -223,12 +229,18 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
 
         address caller = msg.sender;
         uint256 reward = rewards[caller];
-        if (reward > 0) {
-            rewards[caller] = 0;
-            totalRewardsDistributed += reward;
-            rewardsToken.safeTransfer(caller, reward);
-            emit RewardPaid(caller, reward);
+
+        if (reward == 0) return;
+
+        rewards[caller] = 0;
+        totalRewardsDistributed += reward;
+
+        unchecked {
+            rewardPool = rewardPool > reward ? rewardPool - reward : 0;
         }
+
+        rewardsToken.safeTransfer(caller, reward);
+        emit RewardPaid(caller, reward);
     }
 
     /// @dev Exits the staking by withdrawing all tokens and getting the reward
