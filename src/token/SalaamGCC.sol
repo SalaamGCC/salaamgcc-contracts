@@ -42,6 +42,7 @@ contract SalaamGcc is
 
     /// @notice Role identifier for administrative privileges.
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant SUPER_ADMIN_ROLE = keccak256("SUPER_ADMIN_ROLE");
 
     /// @notice Address authorized to mint new tokens.
     address private _minter;
@@ -97,7 +98,13 @@ contract SalaamGcc is
         _transferOwnership(owner);
         _minter = minterAddress;
 
-        // Ensure the owner is one of the admin addresses
+        // Assign SUPER_ADMIN_ROLE to the owner
+        _grantRole(SUPER_ADMIN_ROLE, owner);
+
+        // Set SUPER_ADMIN_ROLE as the admin of ADMIN_ROLE
+        _setRoleAdmin(ADMIN_ROLE, SUPER_ADMIN_ROLE);
+
+        // Assign ADMIN_ROLE to the specified addresses
         _grantRole(ADMIN_ROLE, owner);
         _grantRole(ADMIN_ROLE, adminAddresses[0]);
         _grantRole(ADMIN_ROLE, adminAddresses[1]);
