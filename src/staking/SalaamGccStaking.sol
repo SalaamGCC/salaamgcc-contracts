@@ -40,6 +40,9 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Thrown when staking is stopped before stakingTill
     error StakingPeriodNotOver();
 
+    /// @notice Thrown when periodFinish is not initialized or 0
+    error StakingFinishPeriodNotInitialized();
+
     using SafeERC20 for IERC20;
 
     IERC20 public rewardsToken;
@@ -191,6 +194,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @param amount The amount of tokens to withdraw
     function withdraw(uint256 amount) public nonReentrant {
         if (!(isWithdrawEnable)) revert WithdrawNotAllowed();
+        if (periodFinish == 0) revert StakingFinishPeriodNotInitialized();
         if (amount == 0) {
             revert ZeroAmountNotAllowed();
         }
@@ -212,6 +216,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @dev Staking must be finished or stopped and periodFinish must be over
     function getReward() public nonReentrant {
         if (!(isWithdrawEnable)) revert WithdrawNotAllowed();
+        if (periodFinish == 0) revert StakingFinishPeriodNotInitialized();
         if (block.timestamp <= periodFinish && stoppedAt == 0) {
             revert StakingNotYetOver();
         }
