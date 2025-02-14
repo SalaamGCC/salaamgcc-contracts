@@ -4,12 +4,12 @@ pragma solidity 0.8.28;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Ownable2Step, Ownable } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 /// @title SalaamGCC Staking Contract
 /// @author SalaamGCC
 /// @notice Handles staking of given token and distribute Rewards tokens
-contract SalaamGccStaking is Ownable(msg.sender), ReentrancyGuard {
+contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Thrown when an invalid (zero) amount is provided
     error ZeroAmountNotAllowed();
 
@@ -123,7 +123,7 @@ contract SalaamGccStaking is Ownable(msg.sender), ReentrancyGuard {
         uint256 _stakingTill,
         uint256 _stakingCap,
         uint256 _rate
-    ) {
+    ) Ownable(msg.sender) {
         if (_stakingToken == address(0) || _rewardsToken == address(0)) {
             revert ZeroAddressNotAllowed();
         }
