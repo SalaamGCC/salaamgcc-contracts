@@ -305,7 +305,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
             revert CallerDoesNotHaveAccess();
         }
 
-        IERC20(token).transfer(msg.sender, amount);
+        IERC20(token).safeTransfer(msg.sender, amount);
         emit Sweeped(token, amount);
     }
 
