@@ -184,7 +184,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     }
 
     /// @notice Withdraws a given amount of tokens
-    /// @dev The amount must be greater than 0 and staking must be finished or stopped
+    /// @dev Staking must be finished or stopped and periodFinish must be over
     /// @param amount The amount of tokens to withdraw
     function withdraw(uint256 amount) public nonReentrant {
         if (!(isWithdrawEnable)) revert WithdrawNotAllowed();
@@ -205,8 +205,8 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         emit Withdrawn(caller, amount);
     }
 
-    /// @dev Staking must be finished or stopped
     /// @notice Gets the reward for the caller
+    /// @dev Staking must be finished or stopped and periodFinish must be over
     function getReward() public nonReentrant {
         if (!(isWithdrawEnable)) revert WithdrawNotAllowed();
         if (block.timestamp <= periodFinish && stoppedAt == 0) {
