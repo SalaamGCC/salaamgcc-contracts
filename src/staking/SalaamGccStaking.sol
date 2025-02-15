@@ -228,6 +228,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         }
 
         address caller = msg.sender;
+        rewards[caller] = _updateReward(caller);
         uint256 reward = rewards[caller];
 
         if (reward == 0) return;
@@ -245,8 +246,8 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
 
     /// @dev Exits the staking by withdrawing all tokens and getting the reward
     function exit() external {
-        withdraw(balanceOf[msg.sender]);
         getReward();
+        withdraw(balanceOf[msg.sender]);
     }
 
     /// @notice Notifies the contract of the reward amount
