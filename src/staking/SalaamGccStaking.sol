@@ -43,6 +43,9 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Thrown when periodFinish is not initialized or 0
     error StakingFinishPeriodNotInitialized();
 
+    /// @notice Thrown when recovering staking or reward token
+    error UnauthorizedTokenRecovery();
+
     using SafeERC20 for IERC20;
 
     IERC20 public rewardsToken;
@@ -63,7 +66,6 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
 
     mapping(address user => uint256 rewards) public rewards;
     mapping(address user => uint256 balanceOf) public balanceOf;
-    mapping(address _user => bool sweepers) public sweepers;
 
     /// @notice Emitted when the reward is added
     /// @param reward the amount of reward added
@@ -97,16 +99,6 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @param token the address of recovered token
     /// @param amount the amount of recovered token
     event Recovered(address token, uint256 amount);
-
-    /// @notice Emitted when a token is sweeped
-    /// @param token the address of the token sweeped
-    /// @param amount the amount of the token sweeped
-    event Sweeped(address indexed token, uint256 amount);
-
-    /// @notice Emitted when sweeper address is set
-    /// @param account the address of the sweeper
-    /// @param enable the status of sweeper
-    event SetSweeper(address account, bool enable);
 
     /// @notice Emitted when staking is stop
     /// @param at the unix time when staking stops
@@ -302,31 +294,10 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// Added to support recovering to stuck tokens, even reward token in case emergency. only owner
     function recoverERC20(address _token, uint256 _amount) external onlyOwner {
         if (_token == address(0)) revert ZeroAddressNotAllowed();
+        if (_token == address(stakingToken) || _token == address(rewardsToken)) revert UnauthorizedTokenRecovery();
         if (_amount == 0) revert ZeroAmountNotAllowed();
         IERC20(_token).safeTransfer(msg.sender, _amount);
         emit Recovered(_token, _amount);
-    }
-
-    /// @notice Sets or unsets a sweeper
-    /// @dev Can only be called by the owner
-    /// @param account The address of the account to set or unset as a sweeper
-    /// @param enable A boolean indicating if the account should be enabled as a sweeper
-    function setSweeper(address account, bool enable) external onlyOwner {
-        sweepers[account] = enable;
-        emit SetSweeper(account, enable);
-    }
-
-    /// @notice Sweeps tokens to the caller
-    /// @dev Caller must be an owner or a sweeper
-    /// @param token The address of the token to sweep
-    /// @param amount The amount of tokens to sweep
-    function sweep(address token, uint256 amount) external {
-        if (!(sweepers[msg.sender] || msg.sender == owner())) {
-            revert CallerDoesNotHaveAccess();
-        }
-
-        IERC20(token).safeTransfer(msg.sender, amount);
-        emit Sweeped(token, amount);
     }
 
     /// @notice Stops the staking process
