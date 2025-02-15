@@ -212,6 +212,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         staker.stakedAmount += stakedAmount;
         staker.multiplierBonusAmount += multiplierBonusAmount;
         staker.multiplier = userMultiplier;
+        staker.stakeStart = block.timestamp;
 
         totalSupply += multiplierBonusAmount;
         totalStaked += stakedAmount;
