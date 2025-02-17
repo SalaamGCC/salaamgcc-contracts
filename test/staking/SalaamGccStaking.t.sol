@@ -4,92 +4,90 @@ pragma solidity 0.8.28;
 
 import { BaseTest } from "../BaseTest.t.sol";
 import { SalaamGccStaking } from "../../src/staking/SalaamGccstaking.sol";
+import { console } from "forge-std/console.sol";
 
 contract StakingTest is BaseTest {
     SalaamGccStaking public staking;
-    address public stakingAddress;
-    address public sampleTokenAddress;
+    address stakingAddress;
+    address sampleTokenAddress;
 
-    uint256 public rewardsDuration;
-    uint256 public stakingTill;
-    uint256 public stakingCap;
-    uint256 public rewardRate;
-    uint256 public rewardAmount;
+    uint256 stakingStart = block.timestamp + 15 days;
+    uint256 stakingEnd = stakingStart + 183 days;
+    uint256 stakingMatured = stakingEnd + (rewardsDuration * 1 days);
+    uint256 rewardsDuration = 365;
+    uint256[] multipliers = [200, 190, 180, 170, 160, 150];
+    uint256 lastStakingMonth = multipliers.length;
 
-    /* ========== EVENTS ========== */
-    event RewardAdded(uint256 reward);
-    event Staked(address indexed owner, uint256 amount);
-    event Withdrawn(address indexed owner, uint256 amount);
-    event RewardPaid(address indexed owner, uint256 reward);
-    event IsStakeVestedTokenChanged(bool isStakeVestedToken);
-    event CapChange(uint256 oldCap, uint256 newCap);
-    event Recovered(address token, uint256 amount);
-    event VestingAddressChanged(address _vestingAddress);
-    event Sweeped(address indexed token, uint256 amount);
-    event SetSweeper(address account, bool enable);
-    event StakingStopped(uint256 at);
-    event StakingStart();
+    uint256 stakingCap = 100000000 ether;
 
-    /* ========== ERRORS ========== */
-    error ZeroAmountNotAllowed();
-    error StakingNotAllowed();
-    error StakingCapExceeded();
-    error StakingNotYetOver();
-    error ZeroAddressNotAllowed();
-    error StakeVestedTokenPaused();
-    error InvalidCapLimit();
-    error InvalidCaller();
-    error CallerDoesNotHaveAccess();
+    function test() public override {}
 
     function setUp() public virtual override {
         super.setUp();
-
         sampleTokenAddress = address(sampleToken);
-        rewardsDuration = 90;
-        stakingTill = block.timestamp + 15 days;
-        stakingCap = 150000000 ether;
-        rewardRate = 20;
-        rewardAmount = 2 ether;
-
-        vm.startPrank(owner);
-
+        vm.startBroadcast(owner);
         staking = new SalaamGccStaking(
             sampleTokenAddress,
             sampleTokenAddress,
             rewardsDuration,
-            stakingTill,
+            stakingStart,
+            stakingEnd,
             stakingCap,
-            rewardRate
+            multipliers
         );
         stakingAddress = address(staking);
-        vm.stopPrank();
+        vm.stopBroadcast();
     }
 }
 
-contract StakingDeployment is StakingTest {
-    function testDeploymentShouldWorkCorrectly() external view {
-        assertEq(address(staking.stakingToken()), sampleTokenAddress);
-        assertEq(address(staking.rewardsToken()), sampleTokenAddress);
-        assertEq(staking.rewardsDuration(), rewardsDuration);
-        assertEq(staking.stakingTill(), stakingTill);
+contract StakingDeploymentTest is StakingTest {
+    function test_Deployment_Succeeds() external view {
+        assertEq(address(staking.STAKING_TOKEN()), sampleTokenAddress);
+        assertEq(address(staking.REWARDS_TOKEN()), sampleTokenAddress);
+        assertEq(staking.REWARDS_DURATION(), rewardsDuration);
+        assertEq(staking.STAKING_START(), stakingStart);
+        assertEq(staking.STAKING_END(), stakingEnd);
         assertEq(staking.stakingCap(), stakingCap);
-        assertEq(staking.rewardRate(), rewardRate);
-
-        assertEq(staking.totalSupply(), 0);
-        assertEq(staking.balanceOf(owner), 0);
-        assertEq(staking.rewards(owner), 0);
+        assertEq(staking.totalStakedSupply(), 0);
+        assertEq(staking.rewardsPool(), 0);
+        assertEq(staking.totalStakedSupply(), 0);
+        assertEq(staking.totalRewardsDistributed(), 0);
         assertEq(staking.owner(), address(owner));
+        assertEq(lastStakingMonth, 6);
+
+        uint256 first_month = staking.getMonthlyMultiplier(1);
+        uint256 second_month = staking.getMonthlyMultiplier(2);
+        uint256 third_month = staking.getMonthlyMultiplier(3);
+        uint256 fourth_month = staking.getMonthlyMultiplier(4);
+        uint256 fifth_month = staking.getMonthlyMultiplier(5);
+        uint256 sixth_month = staking.getMonthlyMultiplier(6);
+
+        assertEq(first_month, 200);
+        assertEq(second_month, 190);
+        assertEq(third_month, 180);
+        assertEq(fourth_month, 170);
+        assertEq(fifth_month, 160);
+        assertEq(sixth_month, 150);
+
+        (uint256 multiplier, uint256 stakedAmount, uint256 rewardsAmount, uint256 stakeStart) = staking.getStakerInfo(
+            address(owner)
+        );
+        assertEq(multiplier, 0);
+        assertEq(stakedAmount, 0);
+        assertEq(rewardsAmount, 0);
+        assertEq(stakeStart, 0);
     }
 
-    function testDeploymentShouldRevertWhenPassedZeroAddress() external {
+    function test_Deployment_ZeroAddress_Reverts() external {
         vm.expectRevert(SalaamGccStaking.ZeroAddressNotAllowed.selector);
         staking = new SalaamGccStaking(
             address(0),
             sampleTokenAddress,
             rewardsDuration,
-            stakingTill,
+            stakingStart,
+            stakingEnd,
             stakingCap,
-            rewardRate
+            multipliers
         );
 
         vm.expectRevert(SalaamGccStaking.ZeroAddressNotAllowed.selector);
@@ -97,167 +95,292 @@ contract StakingDeployment is StakingTest {
             sampleTokenAddress,
             address(0),
             rewardsDuration,
-            stakingTill,
+            stakingStart,
+            stakingEnd,
             stakingCap,
-            rewardRate
+            multipliers
         );
     }
 
-    function testDeploymentShouldRevertWhenRewardIsZero() external {
+    function test_Deployment_ZeroRewardsDuration_Reverts() external {
         vm.expectRevert(SalaamGccStaking.ZeroAmountNotAllowed.selector);
-        staking = new SalaamGccStaking(sampleTokenAddress, sampleTokenAddress, 0, stakingTill, stakingCap, rewardRate);
+        staking = new SalaamGccStaking(
+            sampleTokenAddress,
+            sampleTokenAddress,
+            0,
+            stakingStart,
+            stakingEnd,
+            stakingCap,
+            multipliers
+        );
+    }
+
+    function test_Deployment_ZeroStakingStart_Reverts() external {
+        vm.expectRevert(SalaamGccStaking.ZeroAmountNotAllowed.selector);
+        staking = new SalaamGccStaking(
+            sampleTokenAddress,
+            sampleTokenAddress,
+            rewardsDuration,
+            0,
+            stakingEnd,
+            stakingCap,
+            multipliers
+        );
+    }
+
+    function test_Deployment_ZeroStakingEnd_Reverts() external {
+        vm.expectRevert(SalaamGccStaking.ZeroAmountNotAllowed.selector);
+        staking = new SalaamGccStaking(
+            sampleTokenAddress,
+            sampleTokenAddress,
+            rewardsDuration,
+            stakingStart,
+            0,
+            stakingCap,
+            multipliers
+        );
+    }
+
+    function test_Deployment_InvalidMultipliers_Reverts() external {
+        uint256[] memory invalidMultipliers = new uint256[](2);
+
+        invalidMultipliers[0] = 200;
+        invalidMultipliers[1] = 190;
+
+        vm.expectRevert(SalaamGccStaking.InvalidMultipliers.selector);
+        staking = new SalaamGccStaking(
+            sampleTokenAddress,
+            sampleTokenAddress,
+            rewardsDuration,
+            stakingStart,
+            stakingEnd,
+            stakingCap,
+            invalidMultipliers
+        );
+    }
+
+    function test_Deployment_ZeroCap_Reverts() external {
+        vm.expectRevert(SalaamGccStaking.ZeroAmountNotAllowed.selector);
+        staking = new SalaamGccStaking(
+            sampleTokenAddress,
+            sampleTokenAddress,
+            rewardsDuration,
+            stakingStart,
+            stakingEnd,
+            0,
+            multipliers
+        );
     }
 }
 
-contract TotalSupplyTest is StakingTest {
-    function testTotalSupplyShouldWorkCorrectly() external {
-        assertEq(staking.totalSupply(), 0);
+contract TotalStakedSupplyTest is StakingTest {
+    function test_TotalStakedSupply_AfterStaking_Succeeds() external {
+        assertEq(staking.totalStakedSupply(), 0);
 
-        vm.startPrank(owner);
-        sampleToken.approve(address(staking), 2 ether);
-        staking.stake(owner, 2 ether);
-        vm.stopPrank();
+        vm.startBroadcast(owner);
+        skip(15 days);
+        sampleToken.approve(address(staking), 400 ether);
+        staking.stake(owner, 400 ether);
+        vm.stopBroadcast();
 
-        assertEq(staking.totalSupply(), 2 ether);
+        assertEq(staking.totalStakedSupply(), 400 ether);
     }
 }
 
-contract BalanceOfTest is StakingTest {
-    function testBalanceOfShouldWorkCorrectly() external {
-        assertEq(staking.balanceOf(owner), 0);
+contract TotalRewardsSupplyTest is StakingTest {
+    function test_TotalRewardsSupply_AfterStaking_Succeeds() external {
+        assertEq(staking.totalRewardsSupply(), 0);
 
-        vm.startPrank(owner);
-        sampleToken.approve(address(staking), 2 ether);
-        staking.stake(owner, 2 ether);
-        vm.stopPrank();
+        vm.startBroadcast(owner);
+        skip(15 days);
+        sampleToken.approve(address(staking), 400 ether);
+        staking.stake(owner, 400 ether);
+        vm.stopBroadcast();
 
-        assertEq(staking.balanceOf(owner), 2 ether);
-    }
-}
-
-contract SetIsWithdrawEnableTest is StakingTest {
-    function testSetIsWithdrawEnableShouldWorkCorrectly() external {
-        vm.startPrank(owner);
-        staking.setIsWithdrawEnable(true);
-        assertEq(staking.isWithdrawEnable(), true);
-        staking.setIsWithdrawEnable(false);
-        assertEq(staking.isWithdrawEnable(), false);
-        vm.stopPrank();
-    }
-
-    function testRevertWhenSetIsWithdrawEnableCallerIsNotOwner() external {
-        vm.startPrank(adminOne);
-        vm.expectRevert();
-        staking.setIsWithdrawEnable(true);
-        vm.stopPrank();
+        assertEq(staking.totalRewardsSupply(), 800 ether);
     }
 }
 
 contract StakingFunctionalityTest is StakingTest {
-    function testStakeShouldWorkCorrectly() external {
-        uint256 amount = 1000 ether;
-        vm.startPrank(owner);
-        sampleToken.approve(stakingAddress, amount);
-        staking.stake(owner, amount);
-        vm.stopPrank();
-
-        assertEq(staking.balanceOf(owner), amount);
+    function test_Stake_BeforeStart_Reverts() external {
+        vm.startBroadcast(owner);
+        sampleToken.approve(address(staking), 400 ether);
+        vm.expectRevert(SalaamGccStaking.StakingNotStarted.selector);
+        staking.stake(owner, 400 ether);
+        vm.stopBroadcast();
+        (uint256 multiplier, uint256 stakedAmount, uint256 rewardsAmount, uint256 stakeStart) = staking.getStakerInfo(
+            address(owner)
+        );
+        assertEq(multiplier, 0);
+        assertEq(stakedAmount, 0);
+        assertEq(rewardsAmount, 0);
+        assertEq(stakeStart, 0);
     }
 
-    function testRevertWhenStakeExceedsCap() external {
-        uint256 amount = stakingCap + 1 ether;
-        vm.startPrank(owner);
-        sampleToken.approve(stakingAddress, amount);
-        vm.expectRevert();
-        staking.stake(owner, amount);
-        vm.stopPrank();
-    }
-}
-
-contract WithdrawFunctionalityTest is StakingTest {
-    function testWithdrawShouldWorkCorrectly() external {
-        uint256 amount = 1000 ether;
-        vm.startPrank(owner);
-        staking.setIsWithdrawEnable(true);
-        sampleToken.approve(stakingAddress, amount);
-        staking.stake(owner, amount);
-        staking.withdraw(amount);
-        vm.stopPrank();
-
-        assertEq(staking.balanceOf(owner), 0);
-    }
-
-    function testRevertWhenWithdrawDisabled() external {
-        uint256 amount = 1000 ether;
-        vm.startPrank(owner);
-        staking.setIsWithdrawEnable(false);
-        vm.stopPrank();
-
-        vm.startPrank(owner);
-        sampleToken.approve(stakingAddress, amount);
-        staking.stake(owner, amount);
-        vm.expectRevert();
-        staking.withdraw(amount);
-        vm.stopPrank();
+    function test_Stake_AfterStart_Succeeds() external {
+        vm.startBroadcast(owner);
+        skip(15 days);
+        sampleToken.approve(address(staking), 400 ether);
+        staking.stake(owner, 400 ether);
+        vm.stopBroadcast();
+        (uint256 multiplier, uint256 stakedAmount, uint256 rewardsAmount, uint256 stakeStart) = staking.getStakerInfo(
+            address(owner)
+        );
+        assertEq(multiplier, 200);
+        assertEq(stakedAmount, 400 ether);
+        assertEq(rewardsAmount, 800 ether);
+        assertEq(stakeStart, block.timestamp);
     }
 }
 
-contract RewardFunctionalityTest is StakingTest {
-    function testClaimRewardsShouldWorkCorrectly() external {
-        uint256 amount = 1000 ether;
-        vm.startPrank(owner);
-        staking.setIsWithdrawEnable(true);
-        sampleToken.approve(stakingAddress, amount);
-        staking.stake(owner, amount);
-        vm.warp(block.timestamp + rewardsDuration);
-        staking.getReward();
-        vm.stopPrank();
+contract GetStakingInfoTest is StakingTest {
+    function testGetStakingInfoShouldWorkCorrectly() external {
+        (uint256 multiplier, uint256 stakedAmount, uint256 rewardsAmount, uint256 stakeStart) = staking.getStakerInfo(
+            address(owner)
+        );
+        assertEq(multiplier, 0);
+        assertEq(stakedAmount, 0);
+        assertEq(rewardsAmount, 0);
+        assertEq(stakeStart, 0);
+
+        vm.startBroadcast(owner);
+        skip(15 days);
+        sampleToken.approve(address(staking), 400 ether);
+        staking.stake(owner, 400 ether);
+        vm.stopBroadcast();
+
+        (uint256 multiplier2, uint256 stakedAmount2, uint256 rewardsAmount2, uint256 stakeStart2) = staking
+            .getStakerInfo(address(owner));
+        assertEq(multiplier2, 200);
+        assertEq(stakedAmount2, 400 ether);
+        assertEq(rewardsAmount2, 800 ether);
+        assertEq(stakeStart2, block.timestamp);
     }
 }
 
-contract AdminFunctionsTest is StakingTest {
-    function testSetCapShouldWorkCorrectly() external {
-        uint256 newCap = 200000000 ether;
-        vm.startPrank(owner);
-        staking.setCap(newCap);
-        vm.stopPrank();
+// contract SetIsWithdrawEnableTest is StakingTest {
+//     function testSetIsWithdrawEnableShouldWorkCorrectly() external {
+//         vm.startPrank(owner);
+//         staking.setIsWithdrawEnable(true);
+//         assertEq(staking.isWithdrawEnable(), true);
+//         staking.setIsWithdrawEnable(false);
+//         assertEq(staking.isWithdrawEnable(), false);
+//         vm.stopPrank();
+//     }
 
-        assertEq(staking.stakingCap(), newCap);
-    }
+//     function testRevertWhenSetIsWithdrawEnableCallerIsNotOwner() external {
+//         vm.startPrank(adminOne);
+//         vm.expectRevert();
+//         staking.setIsWithdrawEnable(true);
+//         vm.stopPrank();
+//     }
+// }
 
-    function testStartStaking() external {
-        vm.startPrank(owner);
-        staking.startStaking();
-        vm.stopPrank();
-    }
+// contract StakingFunctionalityTest is StakingTest {
+//     function testStakeShouldWorkCorrectly() external {
+//         uint256 amount = 1000 ether;
+//         vm.startPrank(owner);
+//         sampleToken.approve(stakingAddress, amount);
+//         staking.stake(owner, amount);
+//         vm.stopPrank();
 
-    function testStopStaking() external {
-        vm.startPrank(owner);
-        staking.stopStaking();
-        vm.stopPrank();
-    }
+//         assertEq(staking.balanceOf(owner), amount);
+//     }
 
-    function testSetSweeper() external {
-        vm.startPrank(owner);
-        staking.setSweeper(owner, true);
-        vm.stopPrank();
-    }
+//     function testRevertWhenStakeExceedsCap() external {
+//         uint256 amount = stakingCap + 1 ether;
+//         vm.startPrank(owner);
+//         sampleToken.approve(stakingAddress, amount);
+//         vm.expectRevert();
+//         staking.stake(owner, amount);
+//         vm.stopPrank();
+//     }
+// }
 
-    function testSweep() external {
-        uint256 amount = 1000 ether;
-        vm.startPrank(owner);
-        sampleToken.approve(stakingAddress, amount);
-        staking.stake(owner, amount);
-        staking.sweep(sampleTokenAddress, amount);
-        vm.stopPrank();
-    }
+// contract WithdrawFunctionalityTest is StakingTest {
+//     function testWithdrawShouldWorkCorrectly() external {
+//         uint256 amount = 1000 ether;
+//         vm.startPrank(owner);
+//         staking.setIsWithdrawEnable(true);
+//         sampleToken.approve(stakingAddress, amount);
+//         staking.stake(owner, amount);
+//         staking.withdraw(amount);
+//         vm.stopPrank();
 
-    function testRecoverERC20() external {
-        uint256 amount = 1000 ether;
-        vm.startPrank(owner);
-        sampleToken.approve(stakingAddress, amount);
-        staking.stake(owner, amount);
-        staking.recoverERC20(sampleTokenAddress, amount);
-        vm.stopPrank();
-    }
-}
+//         assertEq(staking.balanceOf(owner), 0);
+//     }
+
+//     function testRevertWhenWithdrawDisabled() external {
+//         uint256 amount = 1000 ether;
+//         vm.startPrank(owner);
+//         staking.setIsWithdrawEnable(false);
+//         vm.stopPrank();
+
+//         vm.startPrank(owner);
+//         sampleToken.approve(stakingAddress, amount);
+//         staking.stake(owner, amount);
+//         vm.expectRevert();
+//         staking.withdraw(amount);
+//         vm.stopPrank();
+//     }
+// }
+
+// contract RewardFunctionalityTest is StakingTest {
+//     function testClaimRewardsShouldWorkCorrectly() external {
+//         uint256 amount = 1000 ether;
+//         vm.startPrank(owner);
+//         staking.setIsWithdrawEnable(true);
+//         sampleToken.approve(stakingAddress, amount);
+//         staking.stake(owner, amount);
+//         vm.warp(block.timestamp + rewardsDuration);
+//         staking.getReward();
+//         vm.stopPrank();
+//     }
+// }
+
+// contract AdminFunctionsTest is StakingTest {
+//     function testSetCapShouldWorkCorrectly() external {
+//         uint256 newCap = 200000000 ether;
+//         vm.startPrank(owner);
+//         staking.setCap(newCap);
+//         vm.stopPrank();
+
+//         assertEq(staking.stakingCap(), newCap);
+//     }
+
+//     function testStartStaking() external {
+//         vm.startPrank(owner);
+//         staking.startStaking();
+//         vm.stopPrank();
+//     }
+
+//     function testStopStaking() external {
+//         vm.startPrank(owner);
+//         staking.stopStaking();
+//         vm.stopPrank();
+//     }
+
+//     function testSetSweeper() external {
+//         vm.startPrank(owner);
+//         staking.setSweeper(owner, true);
+//         vm.stopPrank();
+//     }
+
+//     function testSweep() external {
+//         uint256 amount = 1000 ether;
+//         vm.startPrank(owner);
+//         sampleToken.approve(stakingAddress, amount);
+//         staking.stake(owner, amount);
+//         staking.sweep(sampleTokenAddress, amount);
+//         vm.stopPrank();
+//     }
+
+//     function testRecoverERC20() external {
+//         uint256 amount = 1000 ether;
+//         vm.startPrank(owner);
+//         sampleToken.approve(stakingAddress, amount);
+//         staking.stake(owner, amount);
+//         staking.recoverERC20(sampleTokenAddress, amount);
+//         vm.stopPrank();
+//     }
+// }
