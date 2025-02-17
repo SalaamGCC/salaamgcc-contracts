@@ -26,15 +26,15 @@ contract SalaamGcc is
     /// @param newImplementation The address of the invalid implementation.
     error ImplementationIsNotContract(address newImplementation);
 
-    /// @notice Thrown when a function is called while the contract is paused.
-    error ContractPaused();
-
     /// @notice Thrown when an unauthorized address attempts to mint tokens.
     /// @param caller The address that attempted the unauthorized action.
     error UnauthorizedMinter(address caller);
 
-    /// @notice Thrown when an invalid (zero) address is provided.
+    /// @notice Thrown when an invalid address is provided.
     error InvalidAddress();
+
+    /// @notice Thrown when an invalid amount is provided.
+    error InvalidAmount();
 
     string private constant _NAME = "SalaamGCC";
     string private constant _SYMBOL = "SGCC";
@@ -120,7 +120,10 @@ contract SalaamGcc is
     /// @notice Mints tokens to a specified address.
     /// @param to Recipient address.
     /// @param amount Number of tokens to mint.
-    function mint(address to, uint256 amount) external onlyMinter {
+    function mint(address to, uint256 amount) external onlyMinter whenNotPaused {
+        if (to == address(0)) revert InvalidAddress();
+        if (amount == 0) revert InvalidAmount();
+
         _mint(to, amount);
     }
 
@@ -128,6 +131,7 @@ contract SalaamGcc is
     /// @param newMinter New minter address.
     function setMinter(address newMinter) external onlyOwner {
         if (newMinter == address(0)) revert InvalidAddress();
+        if (newMinter == _minter) revert InvalidAddress();
 
         address oldMinter = _minter;
         _minter = newMinter;
@@ -151,8 +155,7 @@ contract SalaamGcc is
         address from,
         address to,
         uint256 amount
-    ) internal virtual override(ERC20Upgradeable, ERC20CappedUpgradeable) {
-        if (paused()) revert ContractPaused();
+    ) internal virtual override(ERC20Upgradeable, ERC20CappedUpgradeable) whenNotPaused {
         super._update(from, to, amount);
     }
 
