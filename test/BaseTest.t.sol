@@ -16,6 +16,8 @@ contract BaseTest is Test {
 
     error EnforcedPause();
 
+    function test() public virtual {}
+
     function setUp() public virtual {
         owner = address(0x1);
         minter = address(0x2);
