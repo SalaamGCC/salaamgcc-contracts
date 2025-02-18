@@ -4,6 +4,7 @@ pragma solidity ^0.8.28;
 import { ERC1967Utils } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import { Test } from "forge-std/Test.sol";
 import { SalaamGcc } from "../../src/token/SalaamGcc.sol";
+import { SalaamGccV2 } from "./mock/SalaamGccV2.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {
@@ -17,6 +18,7 @@ import { console } from "forge-std/console.sol";
 
 contract SalaamGccTest is Test {
     SalaamGcc token;
+    address v2Address;
 
     address owner = address(0x1);
     address minter = address(0x2);
@@ -37,6 +39,8 @@ contract SalaamGccTest is Test {
 
     uint256 amount = 1000 ether;
     uint256 exceedCapAmount = 600000000000 ether;
+
+    event MinterChanged(address indexed oldMinter, address indexed newMinter);
 
     function test() public {}
 
@@ -206,6 +210,8 @@ contract MintTest is SalaamGccTest {
 contract SetMinterTest is SalaamGccTest {
     function test_SetMinter_OwnerSet_Succeeds() external {
         vm.prank(owner);
+        vm.expectEmit(true, true, false, true);
+        emit MinterChanged(minter, newMinter);
         token.setMinter(newMinter);
         vm.prank(newMinter);
         token.mint(owner, 1000 ether);
@@ -387,6 +393,7 @@ contract OwnershipTest is SalaamGccTest {
         vm.prank(owner);
         token.transferOwnership(newOwner);
         assertEq(token.owner(), owner);
+        assertEq(token.pendingOwner(), newOwner);
 
         vm.prank(newOwner);
         token.acceptOwnership();
@@ -541,4 +548,19 @@ contract RoleTest is SalaamGccTest {
     }
 }
 
-contract UpgradabilityTest is SalaamGccTest {}
+contract UpgradabilityTest is SalaamGccTest {
+    function test_Upgradability_Succeeds() external {
+        vm.startBroadcast(owner);
+        SalaamGccV2 newImplementation = new SalaamGccV2();
+        address v2Address = address(newImplementation);
+
+        bytes memory data = abi.encodeCall(newImplementation.upgradeVersion, ());
+        token.upgradeToAndCall(v2Address, data);
+
+        SalaamGccV2 upgradedToken = SalaamGccV2(address(token));
+
+        assertEq(upgradedToken.version(), "v2");
+
+        vm.stopBroadcast();
+    }
+}
