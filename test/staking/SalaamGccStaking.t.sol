@@ -3,7 +3,7 @@
 pragma solidity 0.8.28;
 
 import { BaseTest } from "../BaseTest.t.sol";
-import { SalaamGccStaking } from "../../src/staking/SalaamGccstaking.sol";
+import { SalaamGccStaking } from "../../src/staking/SalaamGccStaking.sol";
 import { console } from "forge-std/console.sol";
 
 contract StakingTest is BaseTest {
