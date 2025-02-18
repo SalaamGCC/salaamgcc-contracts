@@ -270,11 +270,10 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         emit CapChange(oldCap, _newCap);
     }
 
-    /// @notice recover any token from this contract to caller account
+    /// @notice recover stuck token from this contract to caller account
     /// @dev Can only be called by the owner
     /// @param _token address for recovering token
     /// @param _recoveredTokenAmount number of tokens want to recover
-    /// Added to support recovering to stuck tokens
     function recoverERC20(address _token, uint256 _recoveredTokenAmount) external onlyOwner {
         if (_token == address(0)) revert ZeroAddressNotAllowed();
         if (_token == address(STAKING_TOKEN) || _token == address(REWARDS_TOKEN)) revert UnauthorizedTokenRecovery();
