@@ -8,4 +8,6 @@ contract SalaamGccV2 is SalaamGcc {
     function upgradeVersion() public {
         version = "v2";
     }
+
+    function test() public {}
 }
