@@ -173,8 +173,9 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @param stakedAmount The amount of tokens to stake
     function stake(address userAddress, uint256 stakedAmount) external nonReentrant {
         if (block.timestamp < STAKING_START) revert StakingNotStarted();
-        if (stakedAmount == 0) revert ZeroAmountNotAllowed();
         if (block.timestamp >= STAKING_END) revert StakingEnded();
+        if (userAddress == address(0)) revert ZeroAddressNotAllowed();
+        if (stakedAmount == 0) revert ZeroAmountNotAllowed();
         if (totalRewardsSupply + stakedAmount > stakingCap) revert StakingCapExceeded();
 
         StakingInfo storage staker = stakers[userAddress];
@@ -259,7 +260,8 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @dev Can only be called by the owner
     /// @param _newCap value of new StakingCap
     function setCap(uint256 _newCap) external onlyOwner {
-        if (block.timestamp <= STAKING_END) revert StakingEnded();
+        if (block.timestamp >= STAKING_END) revert StakingEnded();
+        if (_newCap == 0) revert ZeroAmountNotAllowed();
         if (_newCap < totalRewardsSupply) {
             revert InvalidCapLimit();
         }
