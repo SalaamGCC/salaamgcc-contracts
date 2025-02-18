@@ -25,9 +25,6 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Thrown when staking cap has exceeded
     error StakingCapExceeded();
 
-    /// @notice Thrown when STAKING_MATURED is not initialized or 0
-    error StakingMaturityNotInitialized();
-
     /// @notice Thrown when staking is not yet started
     error StakingNotStarted();
 
@@ -201,7 +198,6 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Withdraws the staked tokens for the caller
     /// @dev Staking must achieve its maturity
     function claimStakedTokens() public nonReentrant {
-        if (STAKING_MATURED == 0) revert StakingMaturityNotInitialized();
         if (block.timestamp <= STAKING_MATURED) revert StakingNotMatured();
 
         address caller = msg.sender;
@@ -221,7 +217,6 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Gets the rewards for the caller
     /// @dev Staking must achieve its maturity
     function claimRewards() public nonReentrant {
-        if (STAKING_MATURED == 0) revert StakingMaturityNotInitialized();
         if (block.timestamp <= STAKING_MATURED) {
             revert StakingNotMatured();
         }
