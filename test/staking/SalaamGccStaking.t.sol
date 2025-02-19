@@ -340,6 +340,19 @@ contract StakingFunctionalityTest is StakingTest {
         staking.stake(bob, 400 ether);
     }
 
+    function test_Stake_BeforeEnded_Succeeds() external {
+        vm.prank(minter);
+        sampleToken.mint(oscar, 800 ether);
+        vm.startBroadcast(oscar);
+        skip(stakingStart + 180 days);
+        sampleToken.approve(address(staking), 400 ether);
+        staking.stake(bob, 400 ether);
+        assertEq(staking.currentMultiplier(), 150);
+        assertEq(staking.totalRewardsSupply(), 600 ether);
+        vm.stopBroadcast();
+
+    }
+
     function test_Stake_ZeroAmount_Reverts() external {
         vm.prank(minter);
         sampleToken.mint(alice, 100 ether);

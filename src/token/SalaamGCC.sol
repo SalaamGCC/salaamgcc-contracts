@@ -121,7 +121,6 @@ contract SalaamGcc is
     /// @param to Recipient address.
     /// @param amount Number of tokens to mint.
     function mint(address to, uint256 amount) external onlyMinter whenNotPaused {
-        if (to == address(0)) revert InvalidAddress();
         if (amount == 0) revert InvalidAmount();
 
         _mint(to, amount);

@@ -163,6 +163,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         }
 
         uint256 monthsElapsed = ((block.timestamp - STAKING_START) / 30 days) + 1;
+        if(monthsElapsed > LAST_STAKING_MONTH) monthsElapsed = LAST_STAKING_MONTH;
 
         return monthlyMultipliers[monthsElapsed];
     }
