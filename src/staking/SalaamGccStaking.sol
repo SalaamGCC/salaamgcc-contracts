@@ -46,6 +46,9 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @notice Thrown when there is nothing to claim
     error NothingToClaim();
 
+    /// @notice Thrown when trying to fund pool when not required
+    error PoolAlreadyFunded();
+
     using SafeERC20 for IERC20;
 
     IERC20 public immutable STAKING_TOKEN;
@@ -163,7 +166,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         }
 
         uint256 monthsElapsed = ((block.timestamp - STAKING_START) / 30 days) + 1;
-        if(monthsElapsed > LAST_STAKING_MONTH) monthsElapsed = LAST_STAKING_MONTH;
+        if (monthsElapsed > LAST_STAKING_MONTH) monthsElapsed = LAST_STAKING_MONTH;
 
         return monthlyMultipliers[monthsElapsed];
     }
@@ -209,8 +212,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
 
         staker.stakedAmount -= stakedAmount;
 
-        if (totalStakedSupply > 0)
-            totalStakedSupply = totalStakedSupply > stakedAmount ? totalStakedSupply - stakedAmount : 0;
+        totalStakedSupply = totalStakedSupply - stakedAmount;
 
         STAKING_TOKEN.safeTransfer(caller, stakedAmount);
         emit Withdrawn(caller, stakedAmount);
@@ -231,7 +233,8 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
 
         staker.rewardsAmount -= rewardsAmount;
         totalRewardsDistributed += rewardsAmount;
-        rewardsPool = rewardsPool > rewardsAmount ? rewardsPool - rewardsAmount : 0;
+        totalRewardsSupply -= rewardsAmount;
+        rewardsPool = rewardsPool - rewardsAmount;
 
         REWARDS_TOKEN.safeTransfer(caller, rewardsAmount);
         emit RewardsPaid(caller, rewardsAmount);
@@ -247,14 +250,14 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
     /// @dev Can only be called by the owner
     function fundRewardPool() external onlyOwner {
         if (block.timestamp < STAKING_END) revert StakingNotEnded();
-        uint256 rewards = totalRewardsSupply;
 
-        if (rewardsPool < rewards) {
-            uint256 _rewardsPool = rewardsPool;
-            rewardsPool = rewards;
-            REWARDS_TOKEN.safeTransferFrom(msg.sender, address(this), rewards - _rewardsPool);
-            emit RewardsAdded(rewards);
-        }
+        uint256 rewards = totalRewardsSupply;
+        if (rewards <= rewardsPool) revert PoolAlreadyFunded();
+
+        uint256 _rewardsPool = rewardsPool;
+        rewardsPool = rewards;
+        REWARDS_TOKEN.safeTransferFrom(msg.sender, address(this), rewards - _rewardsPool);
+        emit RewardsAdded(rewards);
     }
 
     /// @notice Updates Staking Cap value

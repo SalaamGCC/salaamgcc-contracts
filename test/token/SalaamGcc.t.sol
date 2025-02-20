@@ -245,6 +245,12 @@ contract SetMinterTest is SalaamGccTest {
         vm.expectRevert(SalaamGcc.InvalidAddress.selector);
         token.setMinter(address(0));
     }
+
+    function test_SetMinter_SameMinter_Reverts() external {
+        vm.prank(owner);
+        vm.expectRevert(SalaamGcc.InvalidAddress.selector);
+        token.setMinter(minter);
+    }
 }
 
 contract PauseTest is SalaamGccTest {
@@ -560,6 +566,15 @@ contract UpgradabilityTest is SalaamGccTest {
         SalaamGccV2 upgradedToken = SalaamGccV2(address(token));
 
         assertEq(upgradedToken.version(), "v2");
+
+        vm.stopBroadcast();
+    }
+
+    function test_Upgradability_Reverts() external {
+        vm.startBroadcast(owner);
+
+        vm.expectRevert();
+        token.upgradeToAndCall(minter, "");
 
         vm.stopBroadcast();
     }
