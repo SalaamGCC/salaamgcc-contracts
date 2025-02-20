@@ -177,7 +177,7 @@ contract SalaamGccStaking is Ownable2Step, ReentrancyGuard {
         if (block.timestamp >= STAKING_END) revert StakingEnded();
         if (userAddress == address(0)) revert ZeroAddressNotAllowed();
         if (stakedAmount == 0) revert ZeroAmountNotAllowed();
-        if (totalRewardsSupply + stakedAmount > stakingCap) revert StakingCapExceeded();
+        if (totalStakedSupply + stakedAmount > stakingCap) revert StakingCapExceeded();
 
         StakingInfo storage staker = stakers[userAddress];
         if (staker.stakedAmount != 0) revert UserAlreadyStaked();
