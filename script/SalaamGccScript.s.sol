@@ -10,11 +10,16 @@ contract SalaamGccScript is Script {
     function run() public {
         // Retrieve deployer's private key from environment variables
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address owner = 0x094947f5F7439D6FBDe3228a099D59E52b79A715;
-        address adminOne = 0xB75D71adFc8E5F7c58eA89c22C3B70BEA84A718d;
-        address adminTwo = 0xfDcDF3cFa272c67C17824FC792C9fF798C98eDed;
-        address adminThree = 0x094947f5F7439D6FBDe3228a099D59E52b79A715;
-        address minter = 0x094947f5F7439D6FBDe3228a099D59E52b79A715;
+        // Multisig Owner Wallet Address
+        address owner = 0x09234f69C3400216eB624326669B76bec3dB39C3;
+        // Multisig Token 1 Wallet Address
+        address adminOne = 0x4E9Ff90564C9D6B89d63197A0034c09A50e53190;
+        // Multisig Token 2 Wallet Address
+        address adminTwo = 0x08D8B7852a03e775BE9C0D2137A59E417A4B3e5B;
+        // Multisig Token 3 Wallet Address
+        address adminThree = 0x062f6869e5FC2f56f52a817eAd98c1d6576412F4;
+        // Multisig Minter Wallet Address
+        address minter = 0x09234f69C3400216eB624326669B76bec3dB39C3;
 
         // Start broadcasting transactions using the deployer's private key
         vm.startBroadcast(deployerPrivateKey);
