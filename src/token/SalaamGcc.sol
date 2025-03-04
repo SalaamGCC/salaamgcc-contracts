@@ -9,7 +9,7 @@ import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC2
 import {
     ERC20CappedUpgradeable
 } from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import { AccessControlUpgradeable } from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -18,7 +18,7 @@ contract SalaamGcc is
     ERC20Upgradeable,
     ERC20CappedUpgradeable,
     PausableUpgradeable,
-    OwnableUpgradeable,
+    Ownable2StepUpgradeable,
     AccessControlUpgradeable,
     UUPSUpgradeable
 {
@@ -26,15 +26,15 @@ contract SalaamGcc is
     /// @param newImplementation The address of the invalid implementation.
     error ImplementationIsNotContract(address newImplementation);
 
-    /// @notice Thrown when a function is called while the contract is paused.
-    error ContractPaused();
-
     /// @notice Thrown when an unauthorized address attempts to mint tokens.
     /// @param caller The address that attempted the unauthorized action.
     error UnauthorizedMinter(address caller);
 
-    /// @notice Thrown when an invalid (zero) address is provided.
+    /// @notice Thrown when an invalid address is provided.
     error InvalidAddress();
+
+    /// @notice Thrown when an invalid amount is provided.
+    error InvalidAmount();
 
     string private constant _NAME = "SalaamGCC";
     string private constant _SYMBOL = "SGCC";
@@ -42,6 +42,7 @@ contract SalaamGcc is
 
     /// @notice Role identifier for administrative privileges.
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant SUPER_ADMIN_ROLE = keccak256("SUPER_ADMIN_ROLE");
 
     /// @notice Address authorized to mint new tokens.
     address private _minter;
@@ -91,12 +92,20 @@ contract SalaamGcc is
         address[3] memory adminAddresses,
         address minterAddress
     ) internal onlyInitializing {
+        if (adminAddresses[0] == address(0) || adminAddresses[1] == address(0) || adminAddresses[2] == address(0))
+            revert InvalidAddress();
+
         _transferOwnership(owner);
         _minter = minterAddress;
 
-        // Ensure the owner is one of the admin addresses
-        _grantRole(ADMIN_ROLE, owner);
+        // Assign SUPER_ADMIN_ROLE to the owner
+        _grantRole(SUPER_ADMIN_ROLE, owner);
 
+        // Set SUPER_ADMIN_ROLE as the admin of ADMIN_ROLE
+        _setRoleAdmin(ADMIN_ROLE, SUPER_ADMIN_ROLE);
+
+        // Assign ADMIN_ROLE to the specified addresses
+        _grantRole(ADMIN_ROLE, owner);
         _grantRole(ADMIN_ROLE, adminAddresses[0]);
         _grantRole(ADMIN_ROLE, adminAddresses[1]);
         _grantRole(ADMIN_ROLE, adminAddresses[2]);
@@ -111,7 +120,9 @@ contract SalaamGcc is
     /// @notice Mints tokens to a specified address.
     /// @param to Recipient address.
     /// @param amount Number of tokens to mint.
-    function mint(address to, uint256 amount) external onlyMinter {
+    function mint(address to, uint256 amount) external onlyMinter whenNotPaused {
+        if (amount == 0) revert InvalidAmount();
+
         _mint(to, amount);
     }
 
@@ -119,6 +130,7 @@ contract SalaamGcc is
     /// @param newMinter New minter address.
     function setMinter(address newMinter) external onlyOwner {
         if (newMinter == address(0)) revert InvalidAddress();
+        if (newMinter == _minter) revert InvalidAddress();
 
         address oldMinter = _minter;
         _minter = newMinter;
@@ -142,8 +154,7 @@ contract SalaamGcc is
         address from,
         address to,
         uint256 amount
-    ) internal virtual override(ERC20Upgradeable, ERC20CappedUpgradeable) {
-        if (paused()) revert ContractPaused();
+    ) internal virtual override(ERC20Upgradeable, ERC20CappedUpgradeable) whenNotPaused {
         super._update(from, to, amount);
     }
 

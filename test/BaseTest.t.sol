@@ -4,9 +4,10 @@ pragma solidity 0.8.28;
 import { Test } from "forge-std/Test.sol";
 import { SalaamGcc } from "../src/token/SalaamGcc.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-
+import { MockERC20 } from "./token/mock/MockERC20.sol";
 contract BaseTest is Test {
     SalaamGcc public sampleToken;
+    MockERC20 public mockToken;
     address public owner;
     address public minter;
     address public adminOne;
@@ -16,6 +17,8 @@ contract BaseTest is Test {
 
     error EnforcedPause();
 
+    function test() public virtual {}
+
     function setUp() public virtual {
         owner = address(0x1);
         minter = address(0x2);
@@ -24,7 +27,7 @@ contract BaseTest is Test {
         adminThree = address(0x5);
         nonAdmin = address(0x6);
 
-        vm.startPrank(owner);
+        vm.startBroadcast(owner);
         SalaamGcc implementation = new SalaamGcc();
         bytes memory data = abi.encodeWithSignature(
             "initialize(address,address[3],address)",
@@ -35,7 +38,10 @@ contract BaseTest is Test {
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(address(implementation), owner, data);
         sampleToken = SalaamGcc(address(proxy));
         vm.label(address(sampleToken), "sampleToken");
-        vm.stopPrank();
+
+        mockToken = new MockERC20(owner);
+
+        vm.stopBroadcast();
 
         vm.prank(minter);
         sampleToken.mint(owner, 20000 ether);

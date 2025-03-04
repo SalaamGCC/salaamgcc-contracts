@@ -5,7 +5,8 @@ import { console } from "forge-std/console.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { SalaamGcc } from "../src/token/SalaamGcc.sol";
 
-contract SalaamGCCScript is Script {
+contract SalaamGccScript is Script {
+    function test() public {}
     function run() public {
         // Retrieve deployer's private key from environment variables
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
