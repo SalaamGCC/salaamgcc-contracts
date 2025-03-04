@@ -10,6 +10,7 @@ contract SalaamGccScript is Script {
     function run() public {
         // Retrieve deployer's private key from environment variables
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        
         // Multisig Owner Wallet Address
         address owner = 0x09234f69C3400216eB624326669B76bec3dB39C3;
         // Multisig Token 1 Wallet Address
